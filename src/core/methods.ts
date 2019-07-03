@@ -47,7 +47,9 @@ class Methods {
         Reflect.defineMetadata(Methods.METHODS_KEY, methods, target)
         Reflect.defineMetadata(Methods.REQUEST_KEY, path, target, propertyKey)
         const oldMethod: any = decorator.value
-        decorator.value = (instance: any) => async (ctx: any) => {
+        decorator.value = (instance: any) => async (ctx: any, next: any) => {
+          instance.ctx = ctx;
+
           const params: any = []
 
           // 请求头参数
@@ -76,7 +78,7 @@ class Methods {
           const icts = Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey)
           if (icts) {
             icts.map(async (ins: any) => {
-              await ins.handleInterceptor()
+              await ins.handleInterceptor(ctx, next)
             })
           }
           const result = await oldMethod.apply(instance, params)
