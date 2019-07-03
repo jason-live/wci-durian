@@ -48,6 +48,7 @@ class Methods {
         Reflect.defineMetadata(Methods.REQUEST_KEY, path, target, propertyKey)
         const oldMethod: any = decorator.value
         decorator.value = (instance: any) => async (ctx: any, next: any) => {
+          // ctx对象赋值
           instance.ctx = ctx;
 
           const params: any = []
