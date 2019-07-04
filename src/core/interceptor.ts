@@ -1,20 +1,20 @@
 abstract class Interceptor {
-  static ICT_INSTANCES_KEY = Symbol.for('WCI:ICT_INSTANCES_KEY')
+  static ICT_INSTANCES_KEY = Symbol.for('WCI:ICT_INSTANCES_KEY');
 
-  abstract handleInterceptor(): any
+  abstract handleInterceptor(): any;
 
   getAop() {
-    return this.handleMetadata()
+    return this.handleMetadata();
   }
 
   private handleMetadata() {
     return () => (target: any, propertyKey: string) => {
       const instances =
-        Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey) || []
-      instances.push(this)
-      Reflect.defineMetadata(Interceptor.ICT_INSTANCES_KEY, instances, target, propertyKey)
-    }
+        Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey) || [];
+      instances.push(this);
+      Reflect.defineMetadata(Interceptor.ICT_INSTANCES_KEY, instances, target, propertyKey);
+    };
   }
 }
 
-export default Interceptor
+export default Interceptor;

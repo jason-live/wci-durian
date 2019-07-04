@@ -1297,7 +1297,7 @@
           return this.renderAnno(MethodType.DELETE);
       };
       /**
-       *
+       * 处理注解函数
        * @private
        * @param {*} method
        * @returns
@@ -1315,45 +1315,18 @@
                   Reflect.defineMetadata(Methods.REQUEST_KEY, path, target, propertyKey);
                   var oldMethod = decorator.value;
                   decorator.value = function (instance) { return function (ctx, next) { return __awaiter(_this, void 0, void 0, function () {
-                      var params, headerParams, pathParams, queryParams, bodyParams, icts, result;
-                      var _this = this;
+                      var params, result;
                       return __generator(this, function (_a) {
                           switch (_a.label) {
                               case 0:
                                   // ctx对象赋值
                                   instance.ctx = ctx;
-                                  params = [];
-                                  headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
-                                  if (headerParams) {
-                                      Object.keys(headerParams).map(function (key) { return (params[headerParams[key]] = ctx.request.header[key]); });
-                                  }
-                                  pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
-                                  if (pathParams) {
-                                      Object.keys(pathParams).map(function (key) { return (params[pathParams[key]] = ctx.params[key]); });
-                                  }
-                                  queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
-                                  if (queryParams) {
-                                      Object.keys(queryParams).map(function (key) { return (params[queryParams[key]] = ctx.query[key]); });
-                                  }
-                                  bodyParams = Reflect.getMetadata(Params.BODY_KEY, target, propertyKey);
-                                  if (bodyParams) {
-                                      Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key]] = ctx.request.body); });
-                                  }
-                                  icts = Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey);
-                                  if (icts) {
-                                      icts.map(function (ins) { return __awaiter(_this, void 0, void 0, function () {
-                                          return __generator(this, function (_a) {
-                                              switch (_a.label) {
-                                                  case 0: return [4 /*yield*/, ins.handleInterceptor(ctx, next)];
-                                                  case 1:
-                                                      _a.sent();
-                                                      return [2 /*return*/];
-                                              }
-                                          });
-                                      }); });
-                                  }
-                                  return [4 /*yield*/, oldMethod.apply(instance, params)];
+                                  params = this.renderParams(ctx, target, propertyKey);
+                                  return [4 /*yield*/, this.renderInterceptors(ctx, next, target, propertyKey)];
                               case 1:
+                                  _a.sent();
+                                  return [4 /*yield*/, oldMethod.apply(instance, params)];
+                              case 2:
                                   result = _a.sent();
                                   ctx.response.body = result;
                                   return [2 /*return*/];
@@ -1363,37 +1336,96 @@
               };
           };
       };
+      /**
+       * 处理拦截器
+       * @private
+       * @param {*} ctx
+       * @param {*} next
+       * @param {*} target
+       * @param {*} propertyKey
+       * @memberof Methods
+       */
+      Methods.prototype.renderInterceptors = function (ctx, next, target, propertyKey) {
+          return __awaiter(this, void 0, void 0, function () {
+              var icts;
+              var _this = this;
+              return __generator(this, function (_a) {
+                  icts = Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey);
+                  if (icts) {
+                      icts.map(function (ins) { return __awaiter(_this, void 0, void 0, function () {
+                          return __generator(this, function (_a) {
+                              switch (_a.label) {
+                                  case 0: return [4 /*yield*/, ins.handleInterceptor(ctx, next)];
+                                  case 1:
+                                      _a.sent();
+                                      return [2 /*return*/];
+                              }
+                          });
+                      }); });
+                  }
+                  return [2 /*return*/];
+              });
+          });
+      };
+      /**
+       * 处理请求头参数
+       * @private
+       * @param {*} ctx
+       * @param {*} target
+       * @param {*} propertyKey
+       * @returns
+       * @memberof Methods
+       */
+      Methods.prototype.renderParams = function (ctx, target, propertyKey) {
+          var params = [];
+          // 请求头参数
+          var headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
+          if (headerParams) {
+              Object.keys(headerParams).map(function (key) { return (params[headerParams[key]] = ctx.request.header[key]); });
+          }
+          // 路径参数
+          var pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
+          if (pathParams) {
+              Object.keys(pathParams).map(function (key) { return (params[pathParams[key]] = ctx.params[key]); });
+          }
+          // 查询参数
+          var queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
+          if (queryParams) {
+              Object.keys(queryParams).map(function (key) { return (params[queryParams[key]] = ctx.query[key]); });
+          }
+          // 请求体 body
+          var bodyParams = Reflect.getMetadata(Params.BODY_KEY, target, propertyKey);
+          if (bodyParams) {
+              Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key]] = ctx.request.body); });
+          }
+          return params;
+      };
       Methods.REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');
       Methods.METHOD_KEY = Symbol.for('WCI:METHOD_KEY');
       Methods.METHODS_KEY = Symbol.for('WCI:METHODS_KEY');
       return Methods;
   }());
 
+  /**
+   * WciDurian
+   * @class WciDurian
+   */
   var WciDurian = /** @class */ (function () {
       function WciDurian() {
       }
       WciDurian.metadatas = function () {
           var arr = [];
-          var _loop_1 = function (c) {
-              var methods = Reflect.getMetadata(Methods.METHODS_KEY, c);
-              arr = methods.map(function (methodName) {
-                  // 初始化路由参数
-                  var method = c[methodName](c);
-                  var ctrPath = Reflect.getMetadata(Classes.CONTROLLER_KEY, c);
-                  var methodType = Reflect.getMetadata(Methods.METHOD_KEY, c, methodName);
-                  var path = Reflect.getMetadata(Methods.REQUEST_KEY, c, methodName);
-                  return {
-                      ctrPath: ctrPath,
-                      methodType: methodType,
-                      path: path,
-                      method: method
-                  };
-              });
-          };
-          for (var _i = 0, _a = Array.from(this.cMap.values()); _i < _a.length; _i++) {
-              var c = _a[_i];
-              _loop_1(c);
-          }
+          Array
+              .from(this.cMap.values())
+              .map(function (c) { return Reflect.getMetadata(Methods.METHODS_KEY, c)
+              .map(function (methodName) {
+              // 初始化路由参数
+              var method = c[methodName](c);
+              var ctrPath = Reflect.getMetadata(Classes.CONTROLLER_KEY, c);
+              var methodType = Reflect.getMetadata(Methods.METHOD_KEY, c, methodName);
+              var path = Reflect.getMetadata(Methods.REQUEST_KEY, c, methodName);
+              arr.push({ ctrPath: ctrPath, methodType: methodType, path: path, method: method });
+          }); });
           return arr;
       };
       WciDurian.cMap = new Map();

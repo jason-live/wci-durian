@@ -7,31 +7,26 @@ var params_1 = require("./core/params");
 var methods_1 = require("./core/methods");
 var method_type_1 = require("./static/method_type");
 exports.MethodType = method_type_1.default;
+/**
+ * WciDurian
+ * @class WciDurian
+ */
 var WciDurian = /** @class */ (function () {
     function WciDurian() {
     }
     WciDurian.metadatas = function () {
         var arr = [];
-        var _loop_1 = function (c) {
-            var methods = Reflect.getMetadata(methods_1.default.METHODS_KEY, c);
-            arr = methods.map(function (methodName) {
-                // 初始化路由参数
-                var method = c[methodName](c);
-                var ctrPath = Reflect.getMetadata(classes_1.default.CONTROLLER_KEY, c);
-                var methodType = Reflect.getMetadata(methods_1.default.METHOD_KEY, c, methodName);
-                var path = Reflect.getMetadata(methods_1.default.REQUEST_KEY, c, methodName);
-                return {
-                    ctrPath: ctrPath,
-                    methodType: methodType,
-                    path: path,
-                    method: method
-                };
-            });
-        };
-        for (var _i = 0, _a = Array.from(this.cMap.values()); _i < _a.length; _i++) {
-            var c = _a[_i];
-            _loop_1(c);
-        }
+        Array
+            .from(this.cMap.values())
+            .map(function (c) { return Reflect.getMetadata(methods_1.default.METHODS_KEY, c)
+            .map(function (methodName) {
+            // 初始化路由参数
+            var method = c[methodName](c);
+            var ctrPath = Reflect.getMetadata(classes_1.default.CONTROLLER_KEY, c);
+            var methodType = Reflect.getMetadata(methods_1.default.METHOD_KEY, c, methodName);
+            var path = Reflect.getMetadata(methods_1.default.REQUEST_KEY, c, methodName);
+            arr.push({ ctrPath: ctrPath, methodType: methodType, path: path, method: method });
+        }); });
         return arr;
     };
     WciDurian.cMap = new Map();

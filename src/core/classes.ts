@@ -1,4 +1,4 @@
-import 'reflect-metadata'
+import 'reflect-metadata';
 
 /**
  * 类修饰器
@@ -10,7 +10,7 @@ class Classes {
    * @static
    * @memberof Classes
    */
-  static CONTROLLER_KEY = Symbol.for('WCI:CONTROLLER_KEY')
+  static CONTROLLER_KEY = Symbol.for('WCI:CONTROLLER_KEY');
 
   /**
    * 类修饰器函数
@@ -19,9 +19,9 @@ class Classes {
    */
   getController() {
     return (path: any) => (target: any) => {
-      Reflect.defineMetadata(Classes.CONTROLLER_KEY, path, target.prototype)
-    }
+      Reflect.defineMetadata(Classes.CONTROLLER_KEY, path, target.prototype);
+    };
   }
 }
 
-export default Classes
+export default Classes;

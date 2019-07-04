@@ -3,12 +3,16 @@ import Classes from './core/classes';
 import Params from './core/params';
 import Methods from './core/methods';
 import MethodType from './static/method_type';
+/**
+ * WciDurian
+ * @class WciDurian
+ */
 declare class WciDurian {
     static readonly cMap: Map<any, any>;
     static readonly classes: Classes;
     static readonly params: Params;
     static readonly methods: Methods;
-    static metadatas(): any;
+    static metadatas(): any[];
 }
 export default WciDurian;
 declare const ControllerMapping: (path: any) => (target: any) => void;
