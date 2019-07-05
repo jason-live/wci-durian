@@ -1,6 +1,6 @@
 declare abstract class Interceptor {
     static ICT_INSTANCES_KEY: symbol;
-    abstract handleInterceptor(): any;
+    abstract handleInterceptor(ctx: any, next: any): any;
     getAop(): () => (target: any, propertyKey: string) => void;
     private handleMetadata;
 }

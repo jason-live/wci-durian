@@ -1,7 +1,7 @@
 abstract class Interceptor {
   static ICT_INSTANCES_KEY = Symbol.for('WCI:ICT_INSTANCES_KEY');
 
-  abstract handleInterceptor(): any;
+  abstract handleInterceptor(ctx: any, next: any): any;
 
   getAop() {
     return this.handleMetadata();
