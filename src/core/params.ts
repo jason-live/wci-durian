@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ParamConfig } from '../type/types'
 
 class Params {
   static HEADER_KEY = Symbol.for('WCI:HEADER_KEY');
@@ -30,9 +31,14 @@ class Params {
    * @memberof Param
    */
   private renderAnno(key: any) {
-    return (paramName: string) => (target: any, propertyKey: string, paramIndex: number) => {
+    return (paramConfig: string | ParamConfig) => (target: any, propertyKey: string, paramIndex: number) => {
       const params = Reflect.getMetadata(key, target, propertyKey) || {};
-      params[paramName] = paramIndex;
+      if (typeof paramConfig === 'string') {
+        params[paramConfig] = { value: propertyKey , require: false, index: paramIndex };
+      }
+      if (typeof paramConfig === 'object') {
+        params[paramConfig.value] = { ...paramConfig, index: paramIndex };
+      }
       Reflect.defineMetadata(key, params, target, propertyKey);
     };
   }

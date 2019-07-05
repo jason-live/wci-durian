@@ -136,28 +136,56 @@ var Methods = /** @class */ (function () {
      * @memberof Methods
      */
     Methods.prototype.renderParams = function (ctx, target, propertyKey) {
+        var _this = this;
         var params = [];
         // 请求头参数
         var headerParams = Reflect.getMetadata(params_1.default.HEADER_KEY, target, propertyKey);
         if (headerParams) {
-            Object.keys(headerParams).map(function (key) { return (params[headerParams[key]] = ctx.request.header[key]); });
+            Object.keys(headerParams).map(function (key) {
+                _this.verifyParam(ctx, headerParams[key].require, ctx.query[key], headerParams[key].value);
+                params[headerParams[key].index] = ctx.query[key];
+            });
         }
         // 路径参数
         var pathParams = Reflect.getMetadata(params_1.default.PATH_KEY, target, propertyKey);
         if (pathParams) {
-            Object.keys(pathParams).map(function (key) { return (params[pathParams[key]] = ctx.params[key]); });
+            Object.keys(pathParams).map(function (key) {
+                _this.verifyParam(ctx, pathParams[key].require, ctx.query[key], pathParams[key].value);
+                params[pathParams[key].index] = ctx.query[key];
+            });
         }
         // 查询参数
         var queryParams = Reflect.getMetadata(params_1.default.QUERY_KEY, target, propertyKey);
         if (queryParams) {
-            Object.keys(queryParams).map(function (key) { return (params[queryParams[key]] = ctx.query[key]); });
+            Object.keys(queryParams).map(function (key) {
+                _this.verifyParam(ctx, queryParams[key].require, ctx.query[key], queryParams[key].value);
+                params[queryParams[key].index] = ctx.query[key];
+            });
         }
         // 请求体 body
         var bodyParams = Reflect.getMetadata(params_1.default.BODY_KEY, target, propertyKey);
         if (bodyParams) {
-            Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key]] = ctx.request.body); });
+            Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key].index] = ctx.request.body); });
         }
         return params;
+    };
+    /**
+     * 校验参数是否必传
+     * @private
+     * @param {*} ctx
+     * @param {boolean} require
+     * @param {*} requestParamValue
+     * @param {*} requestParamKey
+     * @memberof Methods
+     */
+    Methods.prototype.verifyParam = function (ctx, require, requestParamValue, requestParamKey) {
+        if (require && !requestParamValue) {
+            ctx.throw({
+                logicno: 8001,
+                message: "\u7F3A\u5C11\u5FC5\u4F20\u53C2\u6570 " + requestParamKey,
+                des: '缺少必传参数',
+            });
+        }
     };
     Methods.REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');
     Methods.METHOD_KEY = Symbol.for('WCI:METHOD_KEY');

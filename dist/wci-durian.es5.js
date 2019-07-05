@@ -1176,42 +1176,6 @@ var Classes = /** @class */ (function () {
     return Classes;
 }());
 
-var Params = /** @class */ (function () {
-    function Params() {
-    }
-    Params.prototype.getHeader = function () {
-        return this.renderAnno(Params.HEADER_KEY);
-    };
-    Params.prototype.getPath = function () {
-        return this.renderAnno(Params.PATH_KEY);
-    };
-    Params.prototype.getQuery = function () {
-        return this.renderAnno(Params.QUERY_KEY);
-    };
-    Params.prototype.getBody = function () {
-        return this.renderAnno(Params.BODY_KEY);
-    };
-    /**
-     * 构建 matedata
-     * @private
-     * @param {*} key
-     * @returns
-     * @memberof Param
-     */
-    Params.prototype.renderAnno = function (key) {
-        return function (paramName) { return function (target, propertyKey, paramIndex) {
-            var params = Reflect.getMetadata(key, target, propertyKey) || {};
-            params[paramName] = paramIndex;
-            Reflect.defineMetadata(key, params, target, propertyKey);
-        }; };
-    };
-    Params.HEADER_KEY = Symbol.for('WCI:HEADER_KEY');
-    Params.PATH_KEY = Symbol.for('WCI:PATH_KEY');
-    Params.QUERY_KEY = Symbol.for('WCI:QUERY_KEY');
-    Params.BODY_KEY = Symbol.for('WCI:BODY_KEY');
-    return Params;
-}());
-
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -1226,6 +1190,17 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 
 function __awaiter(thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1263,6 +1238,47 @@ function __generator(thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 }
+
+var Params = /** @class */ (function () {
+    function Params() {
+    }
+    Params.prototype.getHeader = function () {
+        return this.renderAnno(Params.HEADER_KEY);
+    };
+    Params.prototype.getPath = function () {
+        return this.renderAnno(Params.PATH_KEY);
+    };
+    Params.prototype.getQuery = function () {
+        return this.renderAnno(Params.QUERY_KEY);
+    };
+    Params.prototype.getBody = function () {
+        return this.renderAnno(Params.BODY_KEY);
+    };
+    /**
+     * 构建 matedata
+     * @private
+     * @param {*} key
+     * @returns
+     * @memberof Param
+     */
+    Params.prototype.renderAnno = function (key) {
+        return function (paramConfig) { return function (target, propertyKey, paramIndex) {
+            var params = Reflect.getMetadata(key, target, propertyKey) || {};
+            if (typeof paramConfig === 'string') {
+                params[paramConfig] = { value: propertyKey, require: false, index: paramIndex };
+            }
+            if (typeof paramConfig === 'object') {
+                params[paramConfig.value] = __assign({}, paramConfig, { index: paramIndex });
+            }
+            Reflect.defineMetadata(key, params, target, propertyKey);
+        }; };
+    };
+    Params.HEADER_KEY = Symbol.for('WCI:HEADER_KEY');
+    Params.PATH_KEY = Symbol.for('WCI:PATH_KEY');
+    Params.QUERY_KEY = Symbol.for('WCI:QUERY_KEY');
+    Params.BODY_KEY = Symbol.for('WCI:BODY_KEY');
+    return Params;
+}());
 
 var MethodType = /** @class */ (function () {
     function MethodType() {
@@ -1371,28 +1387,56 @@ var Methods = /** @class */ (function () {
      * @memberof Methods
      */
     Methods.prototype.renderParams = function (ctx, target, propertyKey) {
+        var _this = this;
         var params = [];
         // 请求头参数
         var headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
         if (headerParams) {
-            Object.keys(headerParams).map(function (key) { return (params[headerParams[key]] = ctx.request.header[key]); });
+            Object.keys(headerParams).map(function (key) {
+                _this.verifyParam(ctx, headerParams[key].require, ctx.query[key], headerParams[key].value);
+                params[headerParams[key].index] = ctx.query[key];
+            });
         }
         // 路径参数
         var pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
         if (pathParams) {
-            Object.keys(pathParams).map(function (key) { return (params[pathParams[key]] = ctx.params[key]); });
+            Object.keys(pathParams).map(function (key) {
+                _this.verifyParam(ctx, pathParams[key].require, ctx.query[key], pathParams[key].value);
+                params[pathParams[key].index] = ctx.query[key];
+            });
         }
         // 查询参数
         var queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
         if (queryParams) {
-            Object.keys(queryParams).map(function (key) { return (params[queryParams[key]] = ctx.query[key]); });
+            Object.keys(queryParams).map(function (key) {
+                _this.verifyParam(ctx, queryParams[key].require, ctx.query[key], queryParams[key].value);
+                params[queryParams[key].index] = ctx.query[key];
+            });
         }
         // 请求体 body
         var bodyParams = Reflect.getMetadata(Params.BODY_KEY, target, propertyKey);
         if (bodyParams) {
-            Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key]] = ctx.request.body); });
+            Object.keys(bodyParams).map(function (key) { return (params[bodyParams[key].index] = ctx.request.body); });
         }
         return params;
+    };
+    /**
+     * 校验参数是否必传
+     * @private
+     * @param {*} ctx
+     * @param {boolean} require
+     * @param {*} requestParamValue
+     * @param {*} requestParamKey
+     * @memberof Methods
+     */
+    Methods.prototype.verifyParam = function (ctx, require, requestParamValue, requestParamKey) {
+        if (require && !requestParamValue) {
+            ctx.throw({
+                logicno: 8001,
+                message: "\u7F3A\u5C11\u5FC5\u4F20\u53C2\u6570 " + requestParamKey,
+                des: '缺少必传参数',
+            });
+        }
     };
     Methods.REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');
     Methods.METHOD_KEY = Symbol.for('WCI:METHOD_KEY');

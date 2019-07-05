@@ -37,5 +37,15 @@ declare class Methods {
      * @memberof Methods
      */
     private renderParams;
+    /**
+     * 校验参数是否必传
+     * @private
+     * @param {*} ctx
+     * @param {boolean} require
+     * @param {*} requestParamValue
+     * @param {*} requestParamKey
+     * @memberof Methods
+     */
+    private verifyParam;
 }
 export default Methods;

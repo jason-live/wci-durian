@@ -20,10 +20,10 @@ declare const Get: (path: any) => (target: any, propertyKey: string, decorator: 
 declare const Post: (path: any) => (target: any, propertyKey: string, decorator: TypedPropertyDescriptor<any>) => void;
 declare const Put: (path: any) => (target: any, propertyKey: string, decorator: TypedPropertyDescriptor<any>) => void;
 declare const Del: (path: any) => (target: any, propertyKey: string, decorator: TypedPropertyDescriptor<any>) => void;
-declare const RequestHeader: (paramName: string) => (target: any, propertyKey: string, paramIndex: number) => void;
-declare const RequestPath: (paramName: string) => (target: any, propertyKey: string, paramIndex: number) => void;
-declare const RequestQuery: (paramName: string) => (target: any, propertyKey: string, paramIndex: number) => void;
-declare const RequestBody: (paramName: string) => (target: any, propertyKey: string, paramIndex: number) => void;
+declare const RequestHeader: (paramConfig: string | import("./type/types").ParamConfig) => (target: any, propertyKey: string, paramIndex: number) => void;
+declare const RequestPath: (paramConfig: string | import("./type/types").ParamConfig) => (target: any, propertyKey: string, paramIndex: number) => void;
+declare const RequestQuery: (paramConfig: string | import("./type/types").ParamConfig) => (target: any, propertyKey: string, paramIndex: number) => void;
+declare const RequestBody: (paramConfig: string | import("./type/types").ParamConfig) => (target: any, propertyKey: string, paramIndex: number) => void;
 export { ControllerMapping };
 export { Get, Post, Put, Del };
 export { RequestHeader, RequestPath, RequestQuery, RequestBody };
