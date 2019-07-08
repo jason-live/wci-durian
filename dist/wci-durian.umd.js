@@ -1409,7 +1409,7 @@
           var headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
           if (headerParams) {
               Object.keys(headerParams).map(function (key) {
-                  _this.verifyParam(ctx, headerParams[key].require, ctx.query[key], headerParams[key].value);
+                  _this.verifyParam(headerParams[key].require, ctx.query[key], headerParams[key].value);
                   params[headerParams[key].index] = ctx.query[key];
               });
           }
@@ -1417,7 +1417,7 @@
           var pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
           if (pathParams) {
               Object.keys(pathParams).map(function (key) {
-                  _this.verifyParam(ctx, pathParams[key].require, ctx.query[key], pathParams[key].value);
+                  _this.verifyParam(pathParams[key].require, ctx.query[key], pathParams[key].value);
                   params[pathParams[key].index] = ctx.query[key];
               });
           }
@@ -1425,7 +1425,7 @@
           var queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
           if (queryParams) {
               Object.keys(queryParams).map(function (key) {
-                  _this.verifyParam(ctx, queryParams[key].require, ctx.query[key], queryParams[key].value);
+                  _this.verifyParam(queryParams[key].require, ctx.query[key], queryParams[key].value);
                   params[queryParams[key].index] = ctx.query[key];
               });
           }
@@ -1445,13 +1445,14 @@
        * @param {*} requestParamKey
        * @memberof Methods
        */
-      Methods.prototype.verifyParam = function (ctx, require, requestParamValue, requestParamKey) {
+      Methods.prototype.verifyParam = function (require, requestParamValue, requestParamKey) {
           if (require && !requestParamValue) {
-              ctx.throw({
-                  logicno: 8001,
-                  message: "\u7F3A\u5C11\u5FC5\u4F20\u53C2\u6570 " + requestParamKey,
-                  des: '缺少必传参数',
-              });
+              // ctx.throw({
+              //   logicno: 8001,
+              //   message: `缺少必传参数 ${requestParamKey}`,
+              //   des: '缺少必传参数',
+              // });
+              throw new Error("\u53C2\u6570\u6821\u9A8C\u5931\u8D25 " + requestParamKey);
           }
       };
       Methods.REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');

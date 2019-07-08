@@ -97,7 +97,7 @@ class Methods {
     const headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
     if (headerParams) {
       Object.keys(headerParams).map(key => {
-        this.verifyParam(ctx, headerParams[key].require, ctx.query[key], headerParams[key].value);
+        this.verifyParam(headerParams[key].require, ctx.query[key], headerParams[key].value);
         params[headerParams[key].index] = ctx.query[key];
       });
     }
@@ -105,7 +105,7 @@ class Methods {
     const pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
     if (pathParams) {
       Object.keys(pathParams).map(key => {
-        this.verifyParam(ctx, pathParams[key].require, ctx.query[key], pathParams[key].value);
+        this.verifyParam(pathParams[key].require, ctx.query[key], pathParams[key].value);
         params[pathParams[key].index] = ctx.query[key];
       });
     }
@@ -113,7 +113,7 @@ class Methods {
     const queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
     if (queryParams) {
       Object.keys(queryParams).map(key => {
-        this.verifyParam(ctx, queryParams[key].require, ctx.query[key], queryParams[key].value);
+        this.verifyParam(queryParams[key].require, ctx.query[key], queryParams[key].value);
         params[queryParams[key].index] = ctx.query[key];
       });
     }
@@ -134,13 +134,14 @@ class Methods {
    * @param {*} requestParamKey
    * @memberof Methods
    */
-  private verifyParam(ctx: any, require: boolean, requestParamValue: any, requestParamKey: any) {
+  private verifyParam(require: boolean, requestParamValue: any, requestParamKey: any) {
     if (require && !requestParamValue) {
-      ctx.throw({
-        logicno: 8001,
-        message: `缺少必传参数 ${requestParamKey}`,
-        des: '缺少必传参数',
-      });
+      // ctx.throw({
+      //   logicno: 8001,
+      //   message: `缺少必传参数 ${requestParamKey}`,
+      //   des: '缺少必传参数',
+      // });
+      throw new Error(`参数校验失败 ${requestParamKey}`);
     }
   }
 }
