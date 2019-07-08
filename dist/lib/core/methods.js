@@ -39,6 +39,10 @@ require("reflect-metadata");
 var method_type_1 = require("../static/method_type");
 var params_1 = require("./params");
 var interceptor_1 = require("./interceptor");
+/**
+ * 函数
+ * @class Methods
+ */
 var Methods = /** @class */ (function () {
     function Methods(cMap) {
         this.cMap = cMap;
@@ -106,23 +110,26 @@ var Methods = /** @class */ (function () {
      */
     Methods.prototype.renderInterceptors = function (ctx, next, target, propertyKey) {
         return __awaiter(this, void 0, void 0, function () {
-            var icts;
-            var _this = this;
+            var icts, _i, icts_1, insO;
             return __generator(this, function (_a) {
-                icts = Reflect.getMetadata(interceptor_1.default.ICT_INSTANCES_KEY, target, propertyKey);
-                if (icts) {
-                    icts.map(function (ins) { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, ins.handleInterceptor(ctx, next)];
-                                case 1:
-                                    _a.sent();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); });
+                switch (_a.label) {
+                    case 0:
+                        icts = Reflect.getMetadata(interceptor_1.default.ICT_INSTANCES_KEY, target, propertyKey);
+                        if (!icts) return [3 /*break*/, 4];
+                        _i = 0, icts_1 = icts;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < icts_1.length)) return [3 /*break*/, 4];
+                        insO = icts_1[_i];
+                        return [4 /*yield*/, insO.ins.handleInterceptor(ctx, next, insO.wapper || null)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
                 }
-                return [2 /*return*/];
             });
         });
     };
@@ -190,6 +197,7 @@ var Methods = /** @class */ (function () {
     Methods.REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');
     Methods.METHOD_KEY = Symbol.for('WCI:METHOD_KEY');
     Methods.METHODS_KEY = Symbol.for('WCI:METHODS_KEY');
+    Methods.USES_KEY = Symbol.for('WCI:USES_KEY');
     return Methods;
 }());
 exports.default = Methods;

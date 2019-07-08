@@ -8,9 +8,12 @@ var Interceptor = /** @class */ (function () {
     };
     Interceptor.prototype.handleMetadata = function () {
         var _this = this;
-        return function () { return function (target, propertyKey) {
+        return function (wapper) { return function (target, propertyKey) {
             var instances = Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey) || [];
-            instances.push(_this);
+            instances.push({
+                ins: _this,
+                wapper: wapper,
+            });
             Reflect.defineMetadata(Interceptor.ICT_INSTANCES_KEY, instances, target, propertyKey);
         }; };
     };

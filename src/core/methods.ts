@@ -3,10 +3,15 @@ import MethodType from '../static/method_type';
 import Params from './params';
 import Interceptor from './interceptor';
 
+/**
+ * 函数
+ * @class Methods
+ */
 class Methods {
   static REQUEST_KEY = Symbol.for('WCI:REQUEST_KEY');
   static METHOD_KEY = Symbol.for('WCI:METHOD_KEY');
   static METHODS_KEY = Symbol.for('WCI:METHODS_KEY');
+  static USES_KEY = Symbol.for('WCI:USES_KEY');
 
   private cMap: any;
 
@@ -50,13 +55,9 @@ class Methods {
         decorator.value = (instance: any) => async (ctx: any, next: any) => {
           // ctx对象赋值
           instance.ctx = ctx;
-
           const params: any = this.renderParams(ctx, target, propertyKey);
-
           await this.renderInterceptors(ctx, next, target, propertyKey);
-
           const result = await oldMethod.apply(instance, params);
-
           ctx.response.body = result;
         };
       };
@@ -72,12 +73,12 @@ class Methods {
    * @param {*} propertyKey
    * @memberof Methods
    */
-  private async renderInterceptors(ctx: any, next: any, target: Object, propertyKey: string | symbol) {
+  private async renderInterceptors(ctx: any, next: any, target: any, propertyKey: string | symbol) {
     const icts = Reflect.getMetadata(Interceptor.ICT_INSTANCES_KEY, target, propertyKey);
     if (icts) {
-      icts.map(async (ins: any) => {
-        await ins.handleInterceptor(ctx, next);
-      });
+      for (const insO of icts) {
+        await insO.ins.handleInterceptor(ctx, next, insO.wapper || null);
+      }
     }
   }
 
