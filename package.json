@@ -1,6 +1,6 @@
 {
   "name": "wci-durian",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "keywords": [],
   "main": "dist/wci-durian.umd.js",
