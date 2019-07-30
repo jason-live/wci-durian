@@ -36,8 +36,8 @@ declare class Methods {
      * 处理请求头参数
      * @private
      * @param {*} ctx
-     * @param {*} target
-     * @param {*} propertyKey
+     * @param {Object} target
+     * @param {(string | symbol)} propertyKey
      * @returns
      * @memberof Methods
      */
@@ -45,7 +45,6 @@ declare class Methods {
     /**
      * 校验参数是否必传
      * @private
-     * @param {*} ctx
      * @param {boolean} require
      * @param {*} requestParamValue
      * @param {*} requestParamKey

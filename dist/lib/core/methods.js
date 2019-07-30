@@ -137,8 +137,8 @@ var Methods = /** @class */ (function () {
      * 处理请求头参数
      * @private
      * @param {*} ctx
-     * @param {*} target
-     * @param {*} propertyKey
+     * @param {Object} target
+     * @param {(string | symbol)} propertyKey
      * @returns
      * @memberof Methods
      */
@@ -149,16 +149,16 @@ var Methods = /** @class */ (function () {
         var headerParams = Reflect.getMetadata(params_1.default.HEADER_KEY, target, propertyKey);
         if (headerParams) {
             Object.keys(headerParams).map(function (key) {
-                _this.verifyParam(headerParams[key].require, ctx.query[key], headerParams[key].value);
-                params[headerParams[key].index] = ctx.query[key];
+                _this.verifyParam(headerParams[key].require, ctx.request.header[key], headerParams[key].value);
+                params[headerParams[key].index] = ctx.request.header[key];
             });
         }
         // 路径参数
         var pathParams = Reflect.getMetadata(params_1.default.PATH_KEY, target, propertyKey);
         if (pathParams) {
             Object.keys(pathParams).map(function (key) {
-                _this.verifyParam(pathParams[key].require, ctx.query[key], pathParams[key].value);
-                params[pathParams[key].index] = ctx.query[key];
+                _this.verifyParam(pathParams[key].require, ctx.params[key], pathParams[key].value);
+                params[pathParams[key].index] = ctx.params[key];
             });
         }
         // 查询参数
@@ -179,7 +179,6 @@ var Methods = /** @class */ (function () {
     /**
      * 校验参数是否必传
      * @private
-     * @param {*} ctx
      * @param {boolean} require
      * @param {*} requestParamValue
      * @param {*} requestParamKey
@@ -187,11 +186,6 @@ var Methods = /** @class */ (function () {
      */
     Methods.prototype.verifyParam = function (require, requestParamValue, requestParamKey) {
         if (require && !requestParamValue) {
-            // ctx.throw({
-            //   logicno: 8001,
-            //   message: `缺少必传参数 ${requestParamKey}`,
-            //   des: '缺少必传参数',
-            // });
             throw new Error("\u53C2\u6570\u6821\u9A8C\u5931\u8D25 " + requestParamKey);
         }
     };

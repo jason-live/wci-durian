@@ -86,27 +86,27 @@ class Methods {
    * 处理请求头参数
    * @private
    * @param {*} ctx
-   * @param {*} target
-   * @param {*} propertyKey
+   * @param {Object} target
+   * @param {(string | symbol)} propertyKey
    * @returns
    * @memberof Methods
    */
-  private renderParams(ctx: { query: { [x: string]: any; }; request: { body: any; }; }, target: Object, propertyKey: string | symbol) {
+  private renderParams(ctx: any, target: Object, propertyKey: string | symbol) {
     const params: any = [];
     // 请求头参数
     const headerParams = Reflect.getMetadata(Params.HEADER_KEY, target, propertyKey);
     if (headerParams) {
       Object.keys(headerParams).map(key => {
-        this.verifyParam(headerParams[key].require, ctx.query[key], headerParams[key].value);
-        params[headerParams[key].index] = ctx.query[key];
+        this.verifyParam(headerParams[key].require, ctx.request.header[key], headerParams[key].value);
+        params[headerParams[key].index] = ctx.request.header[key];
       });
     }
     // 路径参数
     const pathParams = Reflect.getMetadata(Params.PATH_KEY, target, propertyKey);
     if (pathParams) {
       Object.keys(pathParams).map(key => {
-        this.verifyParam(pathParams[key].require, ctx.query[key], pathParams[key].value);
-        params[pathParams[key].index] = ctx.query[key];
+        this.verifyParam(pathParams[key].require, ctx.params[key], pathParams[key].value);
+        params[pathParams[key].index] = ctx.params[key];
       });
     }
     // 查询参数
@@ -128,7 +128,6 @@ class Methods {
   /**
    * 校验参数是否必传
    * @private
-   * @param {*} ctx
    * @param {boolean} require
    * @param {*} requestParamValue
    * @param {*} requestParamKey
@@ -136,11 +135,6 @@ class Methods {
    */
   private verifyParam(require: boolean, requestParamValue: any, requestParamKey: any) {
     if (require && !requestParamValue) {
-      // ctx.throw({
-      //   logicno: 8001,
-      //   message: `缺少必传参数 ${requestParamKey}`,
-      //   des: '缺少必传参数',
-      // });
       throw new Error(`参数校验失败 ${requestParamKey}`);
     }
   }
