@@ -59,6 +59,7 @@ class Methods {
           const params: any = this.renderParams(ctx, target, propertyKey);
           await this.renderInterceptors(ctx, next, target, propertyKey);
           const result = await oldMethod.apply(instance, params);
+          ctx.logger.info(result);
           ctx.response.body = result;
         };
       };

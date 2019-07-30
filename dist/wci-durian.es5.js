@@ -1346,6 +1346,7 @@ var Methods = /** @class */ (function () {
                                 return [4 /*yield*/, oldMethod.apply(instance, params)];
                             case 2:
                                 result = _a.sent();
+                                ctx.logger.info(result);
                                 ctx.response.body = result;
                                 return [2 /*return*/];
                         }
