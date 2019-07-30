@@ -1342,6 +1342,7 @@
                       return __generator(this, function (_a) {
                           switch (_a.label) {
                               case 0:
+                                  ctx.logger.info(ctx.request.body);
                                   // ctx对象赋值
                                   instance.ctx = ctx;
                                   params = this.renderParams(ctx, target, propertyKey);
