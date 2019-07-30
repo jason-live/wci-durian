@@ -53,13 +53,11 @@ class Methods {
         Reflect.defineMetadata(Methods.REQUEST_KEY, path, target, propertyKey);
         const oldMethod: any = decorator.value;
         decorator.value = (instance: any) => async (ctx: any, next: any) => {
-          ctx.logger.info(ctx.request.body);
           // ctx对象赋值
           instance.ctx = ctx;
           const params: any = this.renderParams(ctx, target, propertyKey);
           await this.renderInterceptors(ctx, next, target, propertyKey);
           const result = await oldMethod.apply(instance, params);
-          ctx.logger.info(result);
           ctx.response.body = result;
         };
       };
