@@ -1419,8 +1419,9 @@ var Methods = /** @class */ (function () {
         var queryParams = Reflect.getMetadata(Params.QUERY_KEY, target, propertyKey);
         if (queryParams) {
             Object.keys(queryParams).map(function (key) {
-                _this.verifyParam(queryParams[key].require, ctx.query[key], queryParams[key].value);
-                params[queryParams[key].index] = ctx.query[key];
+                var param = ctx.query[key] || ctx.queries[key];
+                _this.verifyParam(queryParams[key].require, param, queryParams[key].value);
+                params[queryParams[key].index] = param;
             });
         }
         // 请求体 body
